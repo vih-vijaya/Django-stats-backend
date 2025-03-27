@@ -41,11 +41,17 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-    - name: Deploy to Azure Web App
+    - name: 'Deploy to Azure Web App'
+      uses: azure/webapps-deploy@v3
       id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
       with:
-        app-name: 'myDjangoapp'
-        slot-name: 'production'
+          app-name: 'myDjangoapp'
+          slot-name: 'Production'
+
+    - name: Run Django commands
+      run: |
+        python manage.py migrate
+        python manage.py collectstatic --noinput
+      shell: bash
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_b877ef63fa054b3c835442d19c9abe96 }}
         images: 'vj7005.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_6fd160b132ac4f09b6d0cab3fa70d476 }}/statapp:${{ github.sha }}'
